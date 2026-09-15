@@ -52,11 +52,23 @@ jobs:
       - name: Install frontend deps
         run: npm ci
 
-      - name: Build APK (debug, arm64)
-        run: npm run tauri android build -- --debug --target aarch64 --apk
+      - name: Build APK (release, arm64, unsigned)
+        run: npm run tauri android build -- --target aarch64 --apk
+
+      # Tiap runner CI baru = keystore baru, jadi tiap build beda signature.
+      # Konsekuensi jujur: update APK wajib uninstall dulu. (Stabil setelah
+      # keystore permanen disimpan di Secrets — backlog.)
+      - name: Sign APK (debug key)
+        run: |
+          keytool -genkeypair -keystore ~/.android/debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10950 -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US" 2>/dev/null || true
+          APKSIGNER="$ANDROID_HOME/build-tools/34.0.0/apksigner"
+          APK=$(ls src-tauri/gen/android/app/build/outputs/apk/arm64/release/*unsigned*.apk | head -1)
+          "$APKSIGNER" sign --ks ~/.android/debug.keystore --ks-pass:android --key-pass:android --out "${APK%.apk}-signed.apk" "$APK"
+          "$APKSIGNER" verify --print-certs "${APK%.apk}-signed.apk" | head -4
+          ls -la src-tauri/gen/android/app/build/outputs/apk/arm64/release/
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: nihonforge-mobile-debug-arm64
-          path: src-tauri/gen/android/app/build/outputs/apk/**/debug/*.apk
+          name: nihonforge-mobile-release-arm64
+          path: src-tauri/gen/android/app/build/outputs/apk/arm64/release/*signed*.apk
