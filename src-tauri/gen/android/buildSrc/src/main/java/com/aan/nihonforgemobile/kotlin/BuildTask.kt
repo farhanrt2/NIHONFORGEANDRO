@@ -30,7 +30,9 @@ open class BuildTask : DefaultTask() {
             project.logger.lifecycle("libnihonforge_lib.so already exists at ${soFile.absolutePath}, skipping Rust build")
             return
         }
-        val executable = """C:\Program Files\nodejs\npm.cmd""";
+        // npm dicari lewat PATH agar portabel (Windows: npm.cmd, lainnya: npm).
+        // Nilai lama hardcoded ke path Windows mesin asal init dan merusak build CI.
+        val executable = if (System.getProperty("os.name").startsWith("Windows", ignoreCase = true)) "npm.cmd" else "npm";
         runTauriCli(executable)
     }
 
