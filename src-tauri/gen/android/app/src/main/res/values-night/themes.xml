@@ -1,6 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Theme.nihonforge" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Customize your theme here. -->
+        <!-- Fullscreen imersif: sembunyikan status bar & navigation bar (sticky, swipe untuk intip). -->
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowLayoutNoLimits">true</item>
     </style>
 </resources>

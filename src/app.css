@@ -140,6 +140,7 @@ body {
 .m-b1 { background: linear-gradient(135deg, #1a0515, #4a1038); }
 .m-b2 { background: linear-gradient(135deg, #1a0a00, #4a2200); }
 .m-b3 { background: linear-gradient(135deg, #000a1a, #002a4a); }
+.m-b4 { background: linear-gradient(135deg, #1a0015, #4a0038); }
 
 .m-menu-foot {
   font-size: 11px;

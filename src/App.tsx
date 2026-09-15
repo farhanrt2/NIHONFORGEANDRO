@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./app.css";
+import { ModalProvider } from "./Modal";
 import {
   seedIfEmpty,
   countKotoba,
@@ -10,8 +11,9 @@ import {
 import Flashcard from "./Flashcard";
 import KotobaTest from "./KotobaTest";
 import KanjiTest from "./KanjiTest";
+import KotobaProgress from "./KotobaProgress";
 
-type Screen = "menu" | "flashcard" | "kotoba" | "kanji";
+type Screen = "menu" | "flashcard" | "kotoba" | "kanji" | "progress";
 
 // Kunci orientasi via Screen Orientation API (progressive enhancement).
 // Di WebView yang tidak mendukung, gagal diam-diam: user putar manual
@@ -68,9 +70,9 @@ export default function App() {
     })();
   }, []);
 
-  // Menu = portrait, layar latihan = coba kunci landscape.
+  // Menu + progress = portrait (sensor), layar latihan = coba kunci landscape.
   useEffect(() => {
-    if (screen === "menu") unlockOrientation();
+    if (screen === "menu" || screen === "progress") unlockOrientation();
     else void lockOrientation("landscape");
   }, [screen]);
 
@@ -85,9 +87,12 @@ export default function App() {
   }
 
   const go = (s: Screen) => setScreen(s);
-  const needRotate = screen !== "menu" && isPortrait;
+  const needRotate =
+    (screen === "flashcard" || screen === "kotoba" || screen === "kanji") &&
+    isPortrait;
 
   return (
+    <ModalProvider>
     <div className="m-root">
       {screen === "menu" && (
         <div className="m-menu">
@@ -111,6 +116,10 @@ export default function App() {
               <span className="m-bigbtn-t">✨ Kanji Test</span>
               <span className="m-bigbtn-s">putar HP ↻</span>
             </button>
+            <button className="m-bigbtn m-b4" onClick={() => go("progress")}>
+              <span className="m-bigbtn-t">📊 Progress</span>
+              <span className="m-bigbtn-s">ringkasan hafalan</span>
+            </button>
           </div>
           <div className="m-menu-foot">progress tersimpan di HP ini</div>
         </div>
@@ -118,6 +127,7 @@ export default function App() {
       {screen === "flashcard" && <Flashcard onClose={() => go("menu")} />}
       {screen === "kotoba" && <KotobaTest onClose={() => go("menu")} />}
       {screen === "kanji" && <KanjiTest onClose={() => go("menu")} />}
+      {screen === "progress" && <KotobaProgress onClose={() => go("menu")} />}
       {needRotate && (
         <div className="m-rotate">
           <div className="m-rotate-card">
@@ -128,5 +138,6 @@ export default function App() {
         </div>
       )}
     </div>
+    </ModalProvider>
   );
 }
