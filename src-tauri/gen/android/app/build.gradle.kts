@@ -37,6 +37,9 @@ android {
             }
         }
         getByName("release") {
+            // Debug key: tiap CI runner bikin keystore sendiri, jadi update
+            // APK wajib uninstall dulu. (Keystore permanen via Secrets = backlog.)
+            signingConfig = signingConfigs.getByName("debug")
             isMinifyEnabled = true
             proguardFiles(
                 *fileTree(".") { include("**/*.pro") }
